@@ -1,0 +1,69 @@
+/* A native-sized control that takes part in the header's own flex layout. */
+.vc-sidebar-toggle {
+    -webkit-app-region: no-drag;
+    border-radius: 6px;
+    color: inherit;
+    flex: 0 0 32px;
+    margin-inline-end: 8px !important;
+    opacity: .82;
+    order: -1;
+}
+
+.vc-sidebar-toggle::after {
+    background: currentColor;
+    content: "";
+    height: 18px;
+    inset-inline-end: -5px;
+    opacity: .18;
+    position: absolute;
+    width: 1px;
+}
+
+.vc-sidebar-toggle .icon__9293f {
+    color: inherit;
+}
+
+.vc-sidebar-toggle:hover {
+    background: var(--background-modifier-hover, rgb(255 255 255 / 10%));
+    opacity: 1;
+}
+
+.vc-sidebar-toggle:focus-visible {
+    opacity: 1;
+    outline: 2px solid var(--focus-primary, #00a8fc);
+    outline-offset: 1px;
+}
+
+/* Discord's compact layout leaves the account controls available on hover/focus. */
+#app-mount .sidebar__5e434[data-collapsed="true"] {
+    overflow: visible;
+}
+
+#app-mount .sidebar__5e434[data-collapsed="true"] .sidebarList__5e434 {
+    display: none;
+}
+
+#app-mount .sidebar__5e434[data-collapsed="true"] .panels__5e434 {
+    overflow: hidden;
+    width: var(--custom-guild-list-width, 72px);
+}
+
+#app-mount .sidebar__5e434[data-collapsed="true"] .panels__5e434:is(:hover, :focus-within) {
+    background-color: var(--background-base-low, #25262b);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+    overflow: visible;
+    width: min(300px, calc(100vw - 16px));
+}
+
+#app-mount .sidebar__5e434[data-collapsed="true"] .panels__5e434:not(:hover):not(:focus-within) .buttons__37e49 {
+    display: none;
+}
+
+#app-mount .sidebar__5e434[data-collapsed="true"] .panels__5e434:not(:hover):not(:focus-within) .container__37e49 {
+    justify-content: center;
+}
+
+#app-mount .sidebar__5e434[data-collapsed="true"] .panels__5e434:not(:hover):not(:focus-within) .accountPopoutButtonWrapper__37e49 {
+    flex: 0 0 auto;
+    margin: 0;
+}
