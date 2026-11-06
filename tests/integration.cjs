@@ -31,7 +31,9 @@ const css = `
   .container__9293f, .header__1add6, .headerBar__8a7fc { display: flex; align-items: center; height: 56px; padding: 8px 16px; background: #252b35; color: #dce0e8; }
   .children__9293f { align-items: center; display: flex; flex: 1; min-width: 0; overflow: hidden; }
   .header__1add6 { background: #9638b0; color: white; }
-  .headerBar__8a7fc { background: #28539a; color: white; }
+  .headerBar__8a7fc { background: #28539a; color: white; gap: 20px; }
+  .navBar__131a1 { background: #ba48cd; color: white; padding: 0; }
+  .navBarContent__131a1 { align-items: center; display: flex; height: 100%; padding: 0 16px; width: 100%; }
   .iconWrapper__9293f { display: flex; position: relative; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; padding: 0; background: transparent; cursor: pointer; }
   .icon__9293f { width: 24px; height: 24px; }
   .title { white-space: nowrap; }
@@ -103,7 +105,7 @@ async function main() {
             const title = document.querySelector(".title").getBoundingClientRect();
             return title.left - toggle.right;
         });
-        assert(spacing >= 8 && spacing <= 16, `unexpected title spacing: ${spacing}px`);
+        assert(spacing >= 4 && spacing <= 8, `unexpected title spacing: ${spacing}px`);
         if (process.env.SIDEBAR_DEMO_PATH) await page.screenshot({ path: process.env.SIDEBAR_DEMO_PATH });
         const initialLeft = await page.$eval(".page__5e434", el => el.getBoundingClientRect().left);
 
@@ -121,12 +123,26 @@ async function main() {
         await page.focus(".accountPopoutButtonWrapper__37e49");
         assert.notEqual(await page.$eval(".buttons__37e49", el => getComputedStyle(el).display), "none", "account controls should be reachable on focus");
 
+        await page.$eval(".page__5e434", el => { el.innerHTML = `<div class="navBar__131a1 container__9293f"><div class="children__9293f"><div class="navBarContent__131a1"><span class="title">Nitro</span></div></div></div>`; });
+        await page.waitForFunction(() => document.querySelector(".navBar__131a1 .vc-sidebar-toggle"));
+        const nitroSpacing = await page.evaluate(() => {
+            const header = document.querySelector(".navBar__131a1").getBoundingClientRect();
+            const toggle = document.querySelector(".vc-sidebar-toggle").getBoundingClientRect();
+            const logo = document.querySelector(".navBarContent__131a1 .title").getBoundingClientRect();
+            return { inset: toggle.left - header.left, gap: logo.left - toggle.right };
+        });
+        assert.equal(nitroSpacing.inset, 16, "Nitro should use the same leading inset as other headers");
+        assert.equal(nitroSpacing.gap, 4, "Nitro's own padding should not add extra space after the toggle");
+        if (process.env.SIDEBAR_NITRO_DEMO_PATH) await page.screenshot({ path: process.env.SIDEBAR_NITRO_DEMO_PATH });
+
         for (const [selector, color] of [["header__1add6", "rgb(150, 56, 176)"], ["headerBar__8a7fc", "rgb(40, 83, 154)"]]) {
             await page.$eval(".page__5e434", (el, cls) => { el.innerHTML = `<div class="${cls}"><span class="title">Home</span></div>`; }, selector);
             await page.waitForFunction(cls => document.querySelector(`.${cls} .vc-sidebar-toggle`), {}, selector);
             assert.equal(await page.$eval(`.${selector}`, el => getComputedStyle(el).backgroundColor), color);
             assert.equal(await page.$eval(button, el => getComputedStyle(el).color), "rgb(255, 255, 255)");
             assert.equal(await page.$eval(button, el => el.getAttribute("aria-expanded")), "false");
+            const gap = await page.evaluate(() => document.querySelector(".title").getBoundingClientRect().left - document.querySelector(".vc-sidebar-toggle").getBoundingClientRect().right);
+            assert.equal(gap, 4, `${selector} should leave 4px after the toggle`);
         }
 
         await page.click(button);

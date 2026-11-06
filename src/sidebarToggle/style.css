@@ -4,7 +4,7 @@
     border-radius: 6px;
     color: inherit;
     flex: 0 0 32px;
-    margin-inline-end: 8px !important;
+    margin-inline-end: 4px !important;
     opacity: .82;
     order: -1;
 }
@@ -13,7 +13,7 @@
     background: currentColor;
     content: "";
     height: 18px;
-    inset-inline-end: -5px;
+    inset-inline-end: -3px;
     opacity: .18;
     position: absolute;
     width: 1px;
@@ -32,6 +32,21 @@
     opacity: 1;
     outline: 2px solid var(--focus-primary, #00a8fc);
     outline-offset: 1px;
+}
+
+/* Nitro keeps its inset inside the navigation content rather than the header. */
+.navBar__131a1 .children__9293f:has(> .vc-sidebar-toggle) {
+    padding-inline-start: var(--space-16, 16px);
+}
+
+.navBar__131a1 .children__9293f:has(> .vc-sidebar-toggle) > .navBarContent__131a1 {
+    min-width: 0;
+    padding-inline-start: 0;
+}
+
+/* Discover's header already contributes 20px of flex gap. */
+.headerBar__8a7fc > .vc-sidebar-toggle {
+    margin-inline-end: -16px !important;
 }
 
 /* Discord's compact layout leaves the account controls available on hover/focus. */
