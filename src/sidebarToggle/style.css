@@ -4,7 +4,7 @@
     border-radius: 6px;
     color: inherit;
     flex: 0 0 32px;
-    margin-inline-end: 4px !important;
+    margin-inline-end: 16px !important;
     opacity: .82;
     order: -1;
 }
@@ -13,7 +13,7 @@
     background: currentColor;
     content: "";
     height: 18px;
-    inset-inline-end: -3px;
+    inset-inline-end: -8px;
     opacity: .18;
     position: absolute;
     width: 1px;
@@ -46,7 +46,7 @@
 
 /* Discover's header already contributes 20px of flex gap. */
 .headerBar__8a7fc > .vc-sidebar-toggle {
-    margin-inline-end: -16px !important;
+    margin-inline-end: -4px !important;
 }
 
 /* Discord's compact layout leaves the account controls available on hover/focus. */

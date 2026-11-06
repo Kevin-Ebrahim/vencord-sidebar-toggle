@@ -100,12 +100,21 @@ async function main() {
         await page.waitForSelector(button);
         assert.equal(await page.$eval(button, el => el.getAttribute("aria-expanded")), "true");
         assert.equal(await page.$eval(button, el => el.getAttribute("aria-label")), "Hide channel sidebar");
-        const spacing = await page.evaluate(() => {
-            const toggle = document.querySelector(".vc-sidebar-toggle").getBoundingClientRect();
-            const title = document.querySelector(".title").getBoundingClientRect();
-            return title.left - toggle.right;
-        });
-        assert(spacing >= 4 && spacing <= 8, `unexpected title spacing: ${spacing}px`);
+        const checkDividerSpacing = async label => {
+            const spacing = await page.evaluate(() => {
+                const toggle = document.querySelector(".vc-sidebar-toggle").getBoundingClientRect();
+                const title = document.querySelector(".title").getBoundingClientRect();
+                const separator = getComputedStyle(document.querySelector(".vc-sidebar-toggle"), "::after");
+                const separatorEnd = toggle.right - parseFloat(separator.insetInlineEnd);
+                return {
+                    before: separatorEnd - parseFloat(separator.width) - toggle.right,
+                    after: title.left - separatorEnd
+                };
+            });
+            assert(spacing.before >= 7 && spacing.after >= 7, `${label}: divider needs room on both sides: ${JSON.stringify(spacing)}`);
+            assert(Math.abs(spacing.before - spacing.after) <= 1, `${label}: divider should be centered: ${JSON.stringify(spacing)}`);
+        };
+        await checkDividerSpacing("channel");
         if (process.env.SIDEBAR_DEMO_PATH) await page.screenshot({ path: process.env.SIDEBAR_DEMO_PATH });
         const initialLeft = await page.$eval(".page__5e434", el => el.getBoundingClientRect().left);
 
@@ -132,7 +141,8 @@ async function main() {
             return { inset: toggle.left - header.left, gap: logo.left - toggle.right };
         });
         assert.equal(nitroSpacing.inset, 16, "Nitro should use the same leading inset as other headers");
-        assert.equal(nitroSpacing.gap, 4, "Nitro's own padding should not add extra space after the toggle");
+        assert.equal(nitroSpacing.gap, 16, "Nitro's own padding should not add extra space after the toggle");
+        await checkDividerSpacing("Nitro");
         if (process.env.SIDEBAR_NITRO_DEMO_PATH) await page.screenshot({ path: process.env.SIDEBAR_NITRO_DEMO_PATH });
 
         for (const [selector, color] of [["header__1add6", "rgb(150, 56, 176)"], ["headerBar__8a7fc", "rgb(40, 83, 154)"]]) {
@@ -142,7 +152,8 @@ async function main() {
             assert.equal(await page.$eval(button, el => getComputedStyle(el).color), "rgb(255, 255, 255)");
             assert.equal(await page.$eval(button, el => el.getAttribute("aria-expanded")), "false");
             const gap = await page.evaluate(() => document.querySelector(".title").getBoundingClientRect().left - document.querySelector(".vc-sidebar-toggle").getBoundingClientRect().right);
-            assert.equal(gap, 4, `${selector} should leave 4px after the toggle`);
+            assert.equal(gap, 16, `${selector} should leave 16px after the toggle`);
+            await checkDividerSpacing(selector);
         }
 
         await page.click(button);
